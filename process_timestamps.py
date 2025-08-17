@@ -4,62 +4,71 @@
 import pandas as pd
 import time
 
-input_csv = r"C:\DATA\NICK Cheeseboard\Processing Copies\ExperimentVideo_2025-08-14_1426_timestamps.csv"
+input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/ExperimentVideo_2025-08-15_1110_preprocessed.csv"
 
-def split_timestamps_by_trial(input_csv, mode='Duration'):
-    df = pd.read_csv(input_csv, header=None, names=['UnixTime', 'Monotonic', 'Event']).copy()
+def split_timestamps_by_trial(input_csv):
+    df = pd.read_csv(input_csv).copy()
 
     # Only keep rows that do not have 0 in the Event column
     trial_df = df[df['Event'] != 0]
 
     # Convert the first column to time
     trial_df['Time'] = pd.to_datetime(trial_df['UnixTime'].astype('int64'), unit='ns')
+
     # Convert the second column to duration, and subtract the first value from all
     trial_df['Duration'] = pd.to_timedelta(trial_df['Monotonic'].astype('int64'), unit='ns')
     trial_df['Duration'] = trial_df['Duration'] - trial_df['Duration'].iloc[0]
+    # Make Duration formatted as Hours, Minutes, Seconds, and Milliseconds
+    trial_df['Duration'] = trial_df['Duration'].apply(lambda x: f"{x.components.hours:02}:{x.components.minutes:02}:{x.components.seconds:02}.{x.components.milliseconds:03}")
 
-    # # Reset the index
+    # Reset the index
     trial_df = trial_df.reset_index(drop=True)
 
     # Go through the trial_df row by row. 
     # For each row, if the value is a 1, start a new row and add the duration in the first column
     # Otherwise, put the duration value in the row corresponding the the event number.
-    formatted_trial_df = pd.DataFrame(columns=['Block',
-                                               'Start_Unix', 'R1_Unix', 'R2_Unix', 'R3_Unix', 'End_Unix', 
-                                               'Start_Mono', 'R1_Mono', 'R2_Mono', 'R3_Mono', 'End_Mono', 
-                                               'Start_Time', 'R1_Time', 'R2_Time', 'R3_Time', 'End_Time', 
-                                               'Start_Duration', 'R1_Duration', 'R2_Duration', 'R3_Duration', 'End_Duration'])
+    formatted_trial_df = pd.DataFrame(columns=['Block', 'Start_Duration', 'SB_Duration', 'R1_Duration', 'R2_Duration', 'R3_Duration', 'End_Duration',
+                                               'Start_Time', 'SB_Time', 'R1_Time', 'R2_Time', 'R3_Time', 'End_Time',
+                                               'Start_Unix', 'SB_Unix', 'R1_Unix', 'R2_Unix', 'R3_Unix', 'End_Unix',
+                                               'Start_Mono', 'SB_Mono', 'R1_Mono', 'R2_Mono', 'R3_Mono', 'End_Mono'])
     loc = 0
-    block = 1
     for i in range(len(trial_df)):
         if trial_df.iloc[i]['Event'] == 1:
-            formatted_trial_df.loc[loc, 'Block'] = block // 10
-            block += 1
-            formatted_trial_df.loc[loc, 'Start_Unix'] = trial_df.iloc[i]['UnixTime']
-            formatted_trial_df.loc[loc, 'Start_Mono'] = trial_df.iloc[i]['Monotonic']
+            loc += 1
+            formatted_trial_df.loc[loc, 'Block'] = 0
             formatted_trial_df.loc[loc, 'Start_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'Start_Duration'] = trial_df.iloc[i]['Duration']
+            formatted_trial_df.loc[loc, 'Start_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'Start_Mono'] = trial_df.iloc[i]['Monotonic']
+            
         elif trial_df.iloc[i]['Event'] == 2:
-            formatted_trial_df.loc[loc, 'R1_Unix'] = trial_df.iloc[i]['UnixTime']
-            formatted_trial_df.loc[loc, 'R1_Mono'] = trial_df.iloc[i]['Monotonic']
+            formatted_trial_df.loc[loc, 'SB_Time'] = trial_df.iloc[i]['Time']
+            formatted_trial_df.loc[loc, 'SB_Duration'] = trial_df.iloc[i]['Duration']
+            formatted_trial_df.loc[loc, 'SB_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'SB_Mono'] = trial_df.iloc[i]['Monotonic']
+
+        elif trial_df.iloc[i]['Event'] == 3:
             formatted_trial_df.loc[loc, 'R1_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R1_Duration'] = trial_df.iloc[i]['Duration']
-        elif trial_df.iloc[i]['Event'] == 3:
-            formatted_trial_df.loc[loc, 'R2_Unix'] = trial_df.iloc[i]['UnixTime']
-            formatted_trial_df.loc[loc, 'R2_Mono'] = trial_df.iloc[i]['Monotonic']
+            formatted_trial_df.loc[loc, 'R1_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'R1_Mono'] = trial_df.iloc[i]['Monotonic']
+            
+        elif trial_df.iloc[i]['Event'] == 4:
             formatted_trial_df.loc[loc, 'R2_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R2_Duration'] = trial_df.iloc[i]['Duration']
-        elif trial_df.iloc[i]['Event'] == 4:
-            formatted_trial_df.loc[loc, 'R3_Unix'] = trial_df.iloc[i]['UnixTime']
-            formatted_trial_df.loc[loc, 'R3_Mono'] = trial_df.iloc[i]['Monotonic']
+            formatted_trial_df.loc[loc, 'R2_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'R2_Mono'] = trial_df.iloc[i]['Monotonic']
+            
+        elif trial_df.iloc[i]['Event'] == 5:
             formatted_trial_df.loc[loc, 'R3_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R3_Duration'] = trial_df.iloc[i]['Duration']
-        elif trial_df.iloc[i]['Event'] == 5:
-            formatted_trial_df.loc[loc, 'End_Unix'] = trial_df.iloc[i]['UnixTime']
-            formatted_trial_df.loc[loc, 'End_Mono'] = trial_df.iloc[i]['Monotonic']
+            formatted_trial_df.loc[loc, 'R3_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'R3_Mono'] = trial_df.iloc[i]['Monotonic']
+        elif trial_df.iloc[i]['Event'] == 6:
             formatted_trial_df.loc[loc, 'End_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'End_Duration'] = trial_df.iloc[i]['Duration']
-            loc += 1
+            formatted_trial_df.loc[loc, 'End_Unix'] = trial_df.iloc[i]['UnixTime']
+            formatted_trial_df.loc[loc, 'End_Mono'] = trial_df.iloc[i]['Monotonic']
 
     return formatted_trial_df
 
@@ -85,21 +94,7 @@ def compute_trial_data(formatted_trial_df):
     return trial_durations
 
 split_by_trial_df = split_timestamps_by_trial(input_csv)
-trial_data = compute_trial_data(split_by_trial_df)
+split_by_trial_df.to_csv(r"/Users/nick/Projects/cheeseboardAnalysis/DATA/ExperimentVideo_2025-08-15_1110_split_by_trial.csv", index=False)
 
-print(trial_data)
-
-# Plot the data per block
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(12, 6))
-colors = ['blue', 'orange']
-for block in trial_data['Block'].unique():
-    block_data = trial_data[trial_data['Block'] == block]
-    plt.plot(block_data['First Reward'], label='First Reward', color=colors[0])
-    plt.plot(block_data['Last Reward'], label='Last Reward', color=colors[1])
-plt.xlabel('Trial')
-plt.ylabel('Time (s)')
-plt.title(f'Trial Durations')
-plt.legend()
-plt.show()
+# trial_data = compute_trial_data(split_by_trial_df)
+# print(trial_data)
