@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/ExperimentVideo_2025-08-15_1110_preprocessed.csv"
+input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
+output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
 
 def split_timestamps_by_trial(input_csv):
     df = pd.read_csv(input_csv).copy()
@@ -20,8 +21,6 @@ def split_timestamps_by_trial(input_csv):
     # Convert the second column to duration, and subtract the first value from all
     trial_df['Duration'] = pd.to_timedelta(trial_df['Monotonic'].astype('int64'), unit='ns')
     trial_df['Duration'] = trial_df['Duration'] - trial_df['Duration'].iloc[0]
-    # Make Duration formatted as Hours, Minutes, Seconds, and Milliseconds
-    # trial_df['Duration'] = trial_df['Duration'].apply(lambda x: f"{x.components.hours:02}:{x.components.minutes:02}:{x.components.seconds:02}.{x.components.milliseconds:03}")
 
     # Reset the index
     trial_df = trial_df.reset_index(drop=True)
@@ -84,7 +83,7 @@ def split_timestamps_by_trial(input_csv):
     return formatted_trial_df
 
 split_by_trial_df = split_timestamps_by_trial(input_csv)
-# split_by_trial_df.to_csv(r"/Users/nick/Projects/cheeseboardAnalysis/DATA/ExperimentVideo_2025-08-15_1110_split_by_trial.csv", index=False)
+split_by_trial_df.to_csv(output_csv, index=False)
 
 def compute_trial_data(formatted_trial_df):
     # Compute metrics per trial (row):
@@ -122,13 +121,13 @@ def compute_trial_data(formatted_trial_df):
 trial_durations = compute_trial_data(split_by_trial_df)
 print(trial_durations)
 
-def plot_trial_times(trial_durations):
-    plt.figure(figsize=(10, 6))
-    plt.plot(trial_durations['First Reward'] // 10**9) # Convert nanoseconds to seconds
-    plt.xlabel('Trial Number')
-    plt.ylabel('Time (seconds)')
-    plt.title('Trial Times')
-    plt.legend()
-    plt.show()
+# def plot_trial_times(trial_durations):
+#     plt.figure(figsize=(10, 6))
+#     plt.plot(trial_durations['R_Time'] // 10**9) # Convert nanoseconds to seconds
+#     plt.xlabel('Trial Number')
+#     plt.ylabel('Time (seconds)')
+#     plt.title('Trial Times')
+#     plt.legend()
+#     plt.show()
 
-plot_trial_times(trial_durations)
+# plot_trial_times(trial_durations)
