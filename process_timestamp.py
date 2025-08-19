@@ -44,6 +44,7 @@ def split_timestamps_by_trial(input_csv):
             # formatted_trial_df.loc[loc, 'Start_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'Start_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'Start_idx'] = trial_df.iloc[i]['Index']
+
             
         elif trial_df.iloc[i]['Event'] == 2:
             # formatted_trial_df.loc[loc, 'SB_Time'] = trial_df.iloc[i]['Time']

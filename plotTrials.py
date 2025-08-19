@@ -3,9 +3,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1146_preprocessed.csv"
-split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1146_split_by_trial.csv"
-save_dir = r"/Users/nick/Projects/cheeseboardAnalysis/FIGURES/"
+processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
+split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
+save_dir = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/FIGURES/"
+desc = "2025-08-13_1105"
 
 def get_trial_path(preprocessed, trial_split, trial_number=0, bodypart='nose'):
     preprocessed_df = pd.read_csv(preprocessed)
@@ -37,11 +38,20 @@ def get_trial_path(preprocessed, trial_split, trial_number=0, bodypart='nose'):
 
     return x_coord, y_coord
 
-fig, ax = plt.subplots(1,1, figsize=(10, 6))
-for t in range(0, 5): 
-    ax.set_title("Trial Path (Trial {t} - 08/15/2025)")
-    x_coord, y_coord = get_trial_path(processed_csv, split_by_trial_csv, trial_number=t, bodypart='nose')
-    ax.plot(x_coord, y_coord)
+# Plot the path of each trial
+def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
+    trial_split_df = pd.read_csv(trial_split)
 
-    fig.savefig(f"{save_dir}trial_{t}_path.png", dpi=300, bbox_inches='tight')
-    plt.close(fig)
+    for i in range(len(trial_split_df)):
+        plt.figure(figsize=(10, 6))
+        x, y = get_trial_path(preprocessed, trial_split, i, bodypart)
+        plt.plot(x, y, label=f'Trial {i + 1}')
+
+        plt.xlabel('X Coordinate')
+        plt.ylabel('Y Coordinate')
+        plt.legend()
+        plt.title(f'Path for trial {i + 1} - {desc}')
+        plt.savefig(f"{save_dir}Block{desc}_{i + 1}.png")
+
+# Plot the path of the nose for each trial
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='nose')
