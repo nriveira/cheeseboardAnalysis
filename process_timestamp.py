@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
-output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
+input_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_preprocessed.csv"
+output_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_split_by_trial.csv"
 
 def split_timestamps_by_trial(input_csv):
     df = pd.read_csv(input_csv).copy()

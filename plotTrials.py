@@ -3,12 +3,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
-split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
-save_dir = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/FIGURES/"
-desc = "2025-08-13_1105"
+processed_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_preprocessed.csv"
+split_by_trial_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_split_by_trial.csv"
+save_dir = r"C:\DATA\NICK Cheeseboard\Figures\\"
+desc = "2025-08-20_1043"
 
-def get_trial_path(preprocessed, trial_split, trial_number=0, bodypart='nose'):
+def get_trial_path(preprocessed, trial_split, trial_number=0, bodypart='backOfHead'):
     preprocessed_df = pd.read_csv(preprocessed)
     trial_split_df = pd.read_csv(trial_split)
 

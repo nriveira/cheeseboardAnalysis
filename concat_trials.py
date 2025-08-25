@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 from process_timestamp import compute_trial_data
 
-split_by_trial_folder = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/"
-output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PROCESSED/combined_trials_edited.csv"
+split_by_trial_folder = r"C:\DATA\NICK Cheeseboard\Preprocessed Data"
+output_csv = r"C:\DATA\NICK Cheeseboard\Processed Data\combined_trials_edited.csv"
 
 def combine_trials(input_folder, output_file):
     # List all CSV files in the input folder
