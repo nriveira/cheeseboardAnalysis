@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-from process_timestamp import compute_trial_data
+from legacy.process_timestamp import compute_trial_data
 
 split_by_trial_folder = r"C:\DATA\NICK Cheeseboard\Preprocessed Data"
 output_csv = r"C:\DATA\NICK Cheeseboard\Processed Data\combined_trials_edited.csv"
