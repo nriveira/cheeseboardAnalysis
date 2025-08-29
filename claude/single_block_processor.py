@@ -154,11 +154,11 @@ class CheeseboardBlock:
     
     def integrate_data(self) -> pd.DataFrame:
         """
-        Combine timestamp and DLC data into a single DataFrame
-        (Based on your combinedDLC.py approach)
+        Combine timestamp and DLC data into a single DataFrame with proper single header row
+        (Based on your combinedDLC.py approach but with improved header handling)
         
         Returns:
-            pd.DataFrame: Integrated dataset
+            pd.DataFrame: Integrated dataset with meaningful column names
         """
         print(f"🔗 Integrating timestamp and DLC data...")
         
@@ -166,30 +166,38 @@ class CheeseboardBlock:
             print("   ❌ Must load data first")
             return None
         
-        # Create header rows for timestamps (to match DLC structure)
-        timestamps_header = pd.DataFrame(
-            0, 
-            index=range(2), 
-            columns=['UnixTime', 'Monotonic', 'Event']
-        )
+        # The raw_dlc already has combined headers from _load_dlc_with_combined_headers()
+        # So we just need to combine with timestamp data
         
-        # Combine header with actual timestamp data
-        timestamps_with_header = pd.concat([
-            timestamps_header, 
-            self.raw_timestamps
-        ], axis=0, ignore_index=True)
+        # Ensure both datasets have the same number of rows
+        min_rows = min(len(self.raw_timestamps), len(self.raw_dlc))
+        if len(self.raw_timestamps) != len(self.raw_dlc):
+            print(f"   ⚠️  Row count mismatch: timestamps={len(self.raw_timestamps)}, dlc={len(self.raw_dlc)}")
+            print(f"   🔧 Using first {min_rows} rows from both datasets")
+        
+        # Get the data portions (trim to same length)
+        timestamps_data = self.raw_timestamps.iloc[:min_rows].copy()
+        dlc_data = self.raw_dlc.iloc[:min_rows].copy()
+        
+        # Reset indices to ensure clean concatenation
+        timestamps_data.reset_index(drop=True, inplace=True)
+        dlc_data.reset_index(drop=True, inplace=True)
         
         # Combine timestamps and DLC data side by side
-        self.integrated_data = pd.concat([
-            timestamps_with_header, 
-            self.raw_dlc
-        ], axis=1)
+        self.integrated_data = pd.concat([timestamps_data, dlc_data], axis=1)
+        
+        # Clean up any empty columns from DLC processing
+        columns_to_drop = [col for col in self.integrated_data.columns if str(col).startswith('empty_col_')]
+        if columns_to_drop:
+            self.integrated_data = self.integrated_data.drop(columns=columns_to_drop)
+            print(f"   🧹 Removed {len(columns_to_drop)} empty DLC columns")
         
         # Save integrated data
         integrated_file = self.output_dir / f"{self.block_id}_integrated.csv"
         self.integrated_data.to_csv(integrated_file, index=False)
         
         print(f"   ✅ Created integrated dataset: {self.integrated_data.shape}")
+        print(f"   📝 Column names: {list(self.integrated_data.columns[:10])}{'...' if len(self.integrated_data.columns) > 10 else ''}")
         print(f"   💾 Saved: {integrated_file}")
         
         return self.integrated_data
@@ -448,13 +456,13 @@ class CheeseboardBlock:
         Returns:
             List[str]: List of detected bodypart names
         """
-        if self.combined_data is None:
+        if self.integrated_data is None:
             return []
         
         bodyparts = set()
         
         # Look for columns with the pattern: bodypart_coordinate
-        for col in self.combined_data.columns:
+        for col in self.integrated_data.columns:
             if '_x' in col or '_y' in col or '_likelihood' in col:
                 # Extract bodypart name (everything before the last underscore)
                 parts = col.split('_')
