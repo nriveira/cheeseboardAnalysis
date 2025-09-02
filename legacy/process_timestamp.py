@@ -5,11 +5,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1207_preprocessed.csv"
-output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1207_split_by_trial.csv"
+input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/RECORDED DATA/ExperimentVideo_2025-08-14_1426_timestamps.csv"
+output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/PREPROCESSED/ExperimentVideo_2025-08-14_1426_split_by_trial.csv"
 
 def split_timestamps_by_trial(input_csv):
-    df = pd.read_csv(input_csv).copy()
+    df = pd.read_csv(input_csv, header=None).copy()
+    # Make the header names
+    df.columns = ['UnixTime', 'Monotonic', 'Event']
 
     # Only keep rows that do not have 0 in the Event column
     trial_df = df[df['Event'] != 0]
@@ -46,35 +48,35 @@ def split_timestamps_by_trial(input_csv):
             formatted_trial_df.loc[loc, 'Start_idx'] = trial_df.iloc[i]['Index']
 
             
-        elif trial_df.iloc[i]['Event'] == 2:
+        if trial_df.iloc[i]['Event'] == 1:
             # formatted_trial_df.loc[loc, 'SB_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'SB_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'SB_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'SB_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'SB_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 3:
+        elif trial_df.iloc[i]['Event'] == 2:
             # formatted_trial_df.loc[loc, 'R1_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R1_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R1_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R1_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R1_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 4:
+        elif trial_df.iloc[i]['Event'] == 3:
             # formatted_trial_df.loc[loc, 'R2_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R2_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R2_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R2_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R2_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 5:
+        elif trial_df.iloc[i]['Event'] == 4:
             # formatted_trial_df.loc[loc, 'R3_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R3_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R3_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R3_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R3_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 6:
+        elif trial_df.iloc[i]['Event'] == 5:
             # formatted_trial_df.loc[loc, 'End_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'End_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'End_Unix'] = trial_df.iloc[i]['UnixTime']
@@ -119,8 +121,8 @@ def compute_trial_data(formatted_trial_df):
 
     return trial_durations
 
-trial_durations = compute_trial_data(split_by_trial_df)
-print(trial_durations)
+# trial_durations = compute_trial_data(split_by_trial_df)
+# trial_durations.to_csv(output_csv, index=False)
 
 # def plot_trial_times(trial_durations):
 #     plt.figure(figsize=(10, 6))

@@ -3,10 +3,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1207_preprocessed.csv"
-split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1207_split_by_trial.csv"
+processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
+split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
 save_dir = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/Figures/"
-desc = "2025-08-15_1207"
+desc = "2025-08-13_1105"
 
 def get_trial_path(preprocessed, trial_split, trial_number=1, bodypart='backOfHead'):
     preprocessed_df = pd.read_csv(preprocessed)
@@ -55,7 +55,7 @@ def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
     # If one of the plots is blank, remove the corresponding axis.
     num_trials = len(trial_split_df)
     num_cols = 5
-    num_rows = 2#(num_trials + num_cols - 1) // num_cols
+    num_rows = (num_trials + num_cols - 1) // num_cols
 
     fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 3 * num_rows))
     axs = axs.flatten()
@@ -67,8 +67,8 @@ def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
             axs[axis_i].plot(x, y, label=f'Trial {i + 1}')
 
             # Indicate the start and end positions
-            axs[axis_i].scatter([x[0]], [y[0]], color='green', label='Start')
-            axs[axis_i].scatter([x[-1]], [y[-1]], color='red', label='End')
+            # axs[axis_i].scatter([x[0]], [y[0]], color='green', label='Start')
+            # axs[axis_i].scatter([x[-1]], [y[-1]], color='red', label='End')
             axs[axis_i].set_title(f'Trial {i + 1}')
 
             axis_i += 1
@@ -78,3 +78,8 @@ def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
 
 # Plot the path of the backOfHead for each trial
 plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='nose')
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='backOfHead')
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='earR')
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='earL')
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='baseOfTail')
+plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='pawFL')

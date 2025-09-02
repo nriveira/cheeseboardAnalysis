@@ -3,9 +3,9 @@
 # Simply concatenate the two DataFrames
 # DLC data contains 3 header columns, so we need to handle that
 
-dlc_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/RECORDED DATA/ExperimentVideo_2025-08-15_1207DLC_resnet50_liveTestAug8shuffle1_100000_filtered.csv"
-time_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/RECORDED DATA/ExperimentVideo_2025-08-15_1207_timestamps.csv"
-output_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-15_1207_preprocessed.csv"
+dlc_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/RECORDED DATA/ExperimentVideo_2025-08-13_1105DLC_resnet50_liveTestAug8shuffle1_100000_filtered.csv"
+time_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/RECORDED DATA/ExperimentVideo_2025-08-13_1105_timestamps.csv"
+output_file = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
 
 import pandas as pd
 
