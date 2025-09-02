@@ -48,35 +48,35 @@ def split_timestamps_by_trial(input_csv):
             formatted_trial_df.loc[loc, 'Start_idx'] = trial_df.iloc[i]['Index']
 
             
-        if trial_df.iloc[i]['Event'] == 1:
+        if trial_df.iloc[i]['Event'] == 2:
             # formatted_trial_df.loc[loc, 'SB_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'SB_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'SB_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'SB_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'SB_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 2:
+        elif trial_df.iloc[i]['Event'] == 3:
             # formatted_trial_df.loc[loc, 'R1_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R1_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R1_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R1_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R1_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 3:
+        elif trial_df.iloc[i]['Event'] == 4:
             # formatted_trial_df.loc[loc, 'R2_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R2_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R2_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R2_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R2_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 4:
+        elif trial_df.iloc[i]['Event'] == 5:
             # formatted_trial_df.loc[loc, 'R3_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'R3_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'R3_Unix'] = trial_df.iloc[i]['UnixTime']
             # formatted_trial_df.loc[loc, 'R3_Mono'] = trial_df.iloc[i]['Monotonic']
             formatted_trial_df.loc[loc, 'R3_idx'] = trial_df.iloc[i]['Index']
 
-        elif trial_df.iloc[i]['Event'] == 5:
+        elif trial_df.iloc[i]['Event'] == 6:
             # formatted_trial_df.loc[loc, 'End_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'End_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'End_Unix'] = trial_df.iloc[i]['UnixTime']
