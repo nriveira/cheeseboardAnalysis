@@ -11,7 +11,7 @@ def plot_mean_and_se_R_Time(combined_df):
     # Group by block and compute mean and standard error per trial
     plt.figure(figsize=(10, 6))
 
-    for group in [0, 1]:
+    for i, group in enumerate([5, 9]):
         group_data = combined_df[combined_df['GROUP'] == group]
         group_data['R_Time'] = group_data['R_Time'].astype('timedelta64[s]').dt.total_seconds()
         summary = group_data.groupby('Trial').agg(
@@ -19,9 +19,11 @@ def plot_mean_and_se_R_Time(combined_df):
             R_Time_sem=('R_Time', 'sem')
         ).reset_index()
 
-        plt.errorbar(summary['Trial'] + group*0.25 - 0.125, summary['R_Time_mean'], yerr=summary['R_Time_sem'], fmt='o', capsize=5)
+        plt.errorbar(summary['Trial'] + i*0.25 - 0.25, summary['R_Time_mean'], yerr=summary['R_Time_sem'], fmt='o', capsize=5)
+
     # Plot mean and standard error, and individual points for all trials
-    plt.title(f'Mean and Standard Error per Trial')
+    plt.title(f'Reward Time Mean and SE Spaced Recall')
+    plt.legend(['Train', '1 Week'])
     plt.xlabel('Trial')
     plt.ylabel('R Time (seconds)')
     plt.xticks(summary['Trial'])
@@ -44,16 +46,17 @@ def plot_mean_and_se_First_Reward(combined_df):
     plt.figure(figsize=(10, 6))
     combined_df['First Reward'] = combined_df['First Reward'].astype('timedelta64[s]').dt.total_seconds()
 
-    for group in [0, 1]:
+    for i, group in enumerate([5, 9]):
         group_data = combined_df[combined_df['GROUP'] == group]
         summary = group_data.groupby('Trial').agg(
             First_Reward_mean=('First Reward', 'mean'),
             First_Reward_sem=('First Reward', 'sem')
         ).reset_index()
 
-        plt.errorbar(summary['Trial'] + group*0.25 - 0.125, summary['First_Reward_mean'], yerr=summary['First_Reward_sem'], fmt='o', capsize=5)
+        plt.errorbar(summary['Trial'] + i*0.25 - 0.125, summary['First_Reward_mean'], yerr=summary['First_Reward_sem'], fmt='o', capsize=5)
 
-    plt.title('Mean and Standard Error of First Reward per Trial')
+    plt.title('First Reward Mean and SE Spaced Recall')
+    plt.legend(['Train', '1 Week'])
     plt.xlabel('Trial')
     plt.ylabel('First Reward Time (seconds)')
     plt.xticks(summary['Trial'])
