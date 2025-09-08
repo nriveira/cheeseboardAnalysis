@@ -5,11 +5,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-input_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_preprocessed.csv"
-output_csv = r"C:\DATA\NICK Cheeseboard\Preprocessed Data\ExperimentVideo_2025-08-20_1043_split_by_trial.csv"
+input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/RECORDED DATA/ExperimentVideo_2025-08-14_1426_timestamps.csv"
+output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/PREPROCESSED/ExperimentVideo_2025-08-14_1426_split_by_trial.csv"
 
 def split_timestamps_by_trial(input_csv):
-    df = pd.read_csv(input_csv).copy()
+    df = pd.read_csv(input_csv, header=None).copy()
+    # Make the header names
+    df.columns = ['UnixTime', 'Monotonic', 'Event']
 
     # Only keep rows that do not have 0 in the Event column
     trial_df = df[df['Event'] != 0]
@@ -46,7 +48,7 @@ def split_timestamps_by_trial(input_csv):
             formatted_trial_df.loc[loc, 'Start_idx'] = trial_df.iloc[i]['Index']
 
             
-        elif trial_df.iloc[i]['Event'] == 2:
+        if trial_df.iloc[i]['Event'] == 2:
             # formatted_trial_df.loc[loc, 'SB_Time'] = trial_df.iloc[i]['Time']
             formatted_trial_df.loc[loc, 'SB_Duration'] = trial_df.iloc[i]['Duration']
             # formatted_trial_df.loc[loc, 'SB_Unix'] = trial_df.iloc[i]['UnixTime']
@@ -119,8 +121,8 @@ def compute_trial_data(formatted_trial_df):
 
     return trial_durations
 
-trial_durations = compute_trial_data(split_by_trial_df)
-print(trial_durations)
+# trial_durations = compute_trial_data(split_by_trial_df)
+# trial_durations.to_csv(output_csv, index=False)
 
 # def plot_trial_times(trial_durations):
 #     plt.figure(figsize=(10, 6))
