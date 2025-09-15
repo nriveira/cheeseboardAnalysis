@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-processed_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_preprocessed.csv"
-split_by_trial_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/ExperimentVideo_2025-08-13_1105_split_by_trial.csv"
-save_dir = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/Figures/"
-desc = "2025-08-13_1105"
+sleap_csv = r"C:\DATA\NICK Cheeseboard\SLEAP Tracking\labels.v001.077_ExperimentVideo_2025-09-04_1013.analysis.csv"
+split_by_trial_csv = r"C:\DATA\NICK Cheeseboard\Experiment Trials\ExperimentVideo_2025-09-04_1013_split_by_trial.csv"
+save_dir = r"C:\DATA\NICK Cheeseboard\Experiment Data"
+desc = "2025-09-04_1013"
 
-def get_trial_path(preprocessed, trial_split, trial_number=1, bodypart='backOfHead'):
-    preprocessed_df = pd.read_csv(preprocessed)
+def get_trial_path(sleap, trial_split, trial_number=1, bodypart='backOfHead'):
+    sleap_df = pd.read_csv(sleap)
     trial_split_df = pd.read_csv(trial_split)
 
     trial_data = trial_split_df.iloc[trial_number]
@@ -22,33 +22,16 @@ def get_trial_path(preprocessed, trial_split, trial_number=1, bodypart='backOfHe
         start_time = int(start_time)
         end_time = int(end_time)
 
-    trial_df = preprocessed_df.iloc[start_time:end_time + 1]
+    # Find the start and end times using the sleap_df column 'frame_idx'
+    trial_df = sleap_df[(sleap_df['frame_idx'] >= start_time) & (sleap_df['frame_idx'] <= end_time)].reset_index(drop=True)
 
-    coords = np.empty((3, end_time - start_time + 1))
-
-    # Get the bodypart coordinates by finding the headers from the bodypart
-    bodypart_headers = [col for col in trial_df.columns if bodypart in col]
-    if len(bodypart_headers) < 3:
-        return None, None
-
-    coords[0] = trial_df[bodypart_headers[0]].values
-    coords[1] = trial_df[bodypart_headers[1]].values
-    coords[2] = trial_df[bodypart_headers[2]].values
-
-    # Print the percentage of coordinates with likelihood above 0.5
-    if coords.shape[0] > 2:
-        valid_coords = coords[2] >= 0.5
-        print(f"Percentage of valid coordinates for trial {trial_number}: {np.sum(valid_coords) / valid_coords.size * 100:.2f}%")
-
-    # If the 3rd coordinate is < 0.5, set coords 0, 1 to NaN
-    if coords.shape[0] > 2:
-        coords[0][coords[2] < 0.5] = np.nan
-        coords[1][coords[2] < 0.5] = np.nan
-
-    return coords[0], coords[1]
+    # Only keep columns that have the bodypart name in them
+    bodypart_columns = [col for col in trial_df.columns if bodypart in col]
+    trial_df = trial_df[bodypart_columns]
+    return trial_df
 
 # Plot the path of each trial
-def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
+def plot_trial_paths(sleap, trial_split, bodypart='nose'):
     trial_split_df = pd.read_csv(trial_split)
 
     # Make one panel to plot all trials, with subplots in groups of 5.
@@ -62,13 +45,12 @@ def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
 
     axis_i = 0
     for i in range(num_trials):
-        x, y = get_trial_path(preprocessed, trial_split, i, bodypart)
-        if x is not None and y is not None:
-            axs[axis_i].plot(x, y, label=f'Trial {i + 1}')
-
-            # Indicate the start and end positions
-            # axs[axis_i].scatter([x[0]], [y[0]], color='green', label='Start')
-            # axs[axis_i].scatter([x[-1]], [y[-1]], color='red', label='End')
+        bp = get_trial_path(sleap, trial_split, i, bodypart)
+        if bp is not None:
+            # The headers are in the format bodypart.x, bodypart.y, bodypart.score
+            bodypart_x = bp.iloc[:, 0]
+            bodypart_y = bp.iloc[:, 1]
+            axs[axis_i].plot(bodypart_x, bodypart_y, label=f'Trial {i + 1}')
             axs[axis_i].set_title(f'Trial {i + 1}')
 
             axis_i += 1
@@ -77,9 +59,9 @@ def plot_trial_paths(preprocessed, trial_split, bodypart='nose'):
     plt.savefig(f"{save_dir}Block{desc}_{bodypart}.png")
 
 # Plot the path of the backOfHead for each trial
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='nose')
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='backOfHead')
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='earR')
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='earL')
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='baseOfTail')
-plot_trial_paths(processed_csv, split_by_trial_csv, bodypart='pawFL')
+plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='nose')
+# plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='backOfHead')
+# plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='earR')
+# plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='earL')
+# plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='baseOfTail')
+# plot_trial_paths(sleap_csv, split_by_trial_csv, bodypart='pawFL')

@@ -1,12 +1,10 @@
 # Given a csv with timestamps of each frame with annotations 
 # Create a new csv with the data split by trial
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-input_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/RECORDED DATA/ExperimentVideo_2025-08-14_1426_timestamps.csv"
-output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/September2ndMeeting/PREPROCESSED/ExperimentVideo_2025-08-14_1426_split_by_trial.csv"
 
 def split_timestamps_by_trial(input_csv):
     df = pd.read_csv(input_csv, header=None).copy()
@@ -85,8 +83,17 @@ def split_timestamps_by_trial(input_csv):
 
     return formatted_trial_df
 
-split_by_trial_df = split_timestamps_by_trial(input_csv)
-split_by_trial_df.to_csv(output_csv, index=False)
+# Go through every file in a folder and convert to a split_by_trial csv
+input_folder = r"C:\DATA\NICK Cheeseboard\Revised Timestamps\Phase2"
+output_folder = r"C:\DATA\NICK Cheeseboard\Experiment Trials\Phase2"
+
+for csv_file in os.listdir(input_folder):
+    if csv_file.endswith('_timestamps.csv'):
+        input_csv = os.path.join(input_folder, csv_file)
+        output_csv = os.path.join(output_folder, csv_file.replace('_timestamps.csv', '_split_by_trial.csv'))
+
+        split_by_trial_df = split_timestamps_by_trial(input_csv)
+        split_by_trial_df.to_csv(output_csv, index=False)
 
 def compute_trial_data(formatted_trial_df):
     # Compute metrics per trial (row):
@@ -120,17 +127,3 @@ def compute_trial_data(formatted_trial_df):
     trial_durations['R_Time'] = trial_durations['Last Reward'] - trial_durations['First Reward']
 
     return trial_durations
-
-# trial_durations = compute_trial_data(split_by_trial_df)
-# trial_durations.to_csv(output_csv, index=False)
-
-# def plot_trial_times(trial_durations):
-#     plt.figure(figsize=(10, 6))
-#     plt.plot(trial_durations['R_Time'] // 10**9) # Convert nanoseconds to seconds
-#     plt.xlabel('Trial Number')
-#     plt.ylabel('Time (seconds)')
-#     plt.title('Trial Times')
-#     plt.legend()
-#     plt.show()
-
-# plot_trial_times(trial_durations)

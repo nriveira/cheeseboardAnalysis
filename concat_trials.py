@@ -6,10 +6,10 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-from process_timestamp import compute_trial_data
+from legacy.process_timestamp import compute_trial_data
 
-split_by_trial_folder = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PREPROCESSED/"
-output_csv = r"/Users/nick/Projects/cheeseboardAnalysis/DATA/PROCESSED/combined_trials_edited.csv"
+split_by_trial_folder = r"C:\DATA\NICK Cheeseboard\Experiment Trials"
+output_csv = r"C:\DATA\NICK Cheeseboard\Experiment Data\combined_experiment_data.csv"
 
 def combine_trials(input_folder, output_file):
     # List all CSV files in the input folder
@@ -44,7 +44,7 @@ def combine_trials(input_folder, output_file):
     combined_df.to_csv(output_file, index=False)
     print(f"Combined data saved to {output_file}")
 
-# combine_trials(split_by_trial_folder, output_csv)
+combine_trials(split_by_trial_folder, output_csv)
 
 combined_df = pd.read_csv(output_csv)
 # Use the combined DataFrame to plot mean and standard error per block
@@ -58,7 +58,7 @@ def plot_mean_and_se_R_Time(combined_df):
     # Plot mean and standard error, and individual points for all trials
     plt.figure(figsize=(10, 6))
     plt.errorbar(summary['Trial'], summary['R_Time_mean'], yerr=summary['R_Time_sem'], fmt='o', capsize=5)
-    plt.title('Mean and Standard Error per Trial (n=14 blocks)')
+    plt.title('Mean and Standard Error per Trial')
     plt.xlabel('Trial')
     plt.ylabel('R Time (seconds)')
     plt.xticks(summary['Trial'])
@@ -86,7 +86,7 @@ def plot_mean_and_se_First_Reward(combined_df):
     ).reset_index()
     plt.figure(figsize=(10, 6))
     plt.errorbar(summary['Trial'], summary['First_Reward_mean'], yerr=summary['First_Reward_sem'], fmt='o', capsize=5)
-    plt.title('Mean and Standard Error of First Reward per Trial (n=14 blocks)')
+    plt.title('Mean and Standard Error of First Reward per Trial')
     plt.xlabel('Trial')
     plt.ylabel('First Reward Time (seconds)')
     plt.xticks(summary['Trial'])
