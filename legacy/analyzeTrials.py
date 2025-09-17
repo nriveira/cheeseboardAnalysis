@@ -3,15 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 output_csv = r"C:\DATA\NICK Cheeseboard\Experiment Data\combined_experiment_data_Phase2.csv"
+plot_group = [2]
 
 combined_df = pd.read_csv(output_csv)
 # Use the combined DataFrame to plot mean and standard error per block
 # Use the GROUP column to plot the different groups we are comparing
 def plot_mean_and_se_R_Time(combined_df):
     # Group by block and compute mean and standard error per trial
+    # Use the color column to make each point a different color
     plt.figure(figsize=(10, 6))
 
-    for i, group in enumerate([0,1,2]):
+    for i, group in enumerate(plot_group):
         group_data = combined_df[combined_df['GROUP'] == group]
         group_data['R_Time'] = group_data['R_Time'].astype('timedelta64[s]').dt.total_seconds()
         summary = group_data.groupby('Trial').agg(
@@ -20,10 +22,15 @@ def plot_mean_and_se_R_Time(combined_df):
         ).reset_index()
 
         plt.errorbar(summary['Trial'] + i*0.25 - 0.25, summary['R_Time_mean'], yerr=summary['R_Time_sem'], fmt='o', capsize=5)
+        # Also plot individual points for all trials
+        plt.scatter(group_data['Trial'], group_data['R_Time'], alpha=0.3)
 
     # Plot mean and standard error, and individual points for all trials
-    plt.title(f'Test Reward Time Mean and SE Break vs No Break')
-    plt.legend(['Train', 'Recall', 'Test'])  
+    # Change y axis limits to 0 to 45
+    plt.ylim(0, 45)
+
+    plt.title(f'Test Reward Time Mean and SE')
+    # plt.legend(['Train', 'Recall', 'Test'])  
     plt.xlabel('Trial')
     plt.ylabel('R Time (seconds)')
     plt.xticks(summary['Trial'])
@@ -46,7 +53,7 @@ def plot_mean_and_se_First_Reward(combined_df):
     plt.figure(figsize=(10, 6))
     combined_df['First Reward'] = combined_df['First Reward'].astype('timedelta64[s]').dt.total_seconds()
 
-    for i, group in enumerate([0,1,2]):
+    for i, group in enumerate(plot_group):
         group_data = combined_df[combined_df['GROUP'] == group]
         summary = group_data.groupby('Trial').agg(
             First_Reward_mean=('First Reward', 'mean'),
@@ -55,41 +62,13 @@ def plot_mean_and_se_First_Reward(combined_df):
 
         plt.errorbar(summary['Trial'] + i*0.25 - 0.125, summary['First_Reward_mean'], yerr=summary['First_Reward_sem'], fmt='o', capsize=5)
 
-    plt.title('Test First Reward Mean and SE Break vs No Break')
-    plt.legend(['Train', 'Recall', 'Test'])
+    plt.title('Test First Reward Mean and SE')
+    # plt.legend(['Train', 'Recall', 'Test'])
     plt.xlabel('Trial')
     plt.ylabel('First Reward Time (seconds)')
     plt.xticks(summary['Trial'])
     plt.show()
 
-# Plot the performance of the first trial for all time points in a group
-def plot_group_over_time(combined_df):
-    plt.figure(figsize=(10, 6))
-    for group in [0]:
-        group_data = combined_df[combined_df['GROUP'] == group]
-        # Pull only the first three trials from each datetime
-        group_data['First Reward'] = group_data['First Reward'].astype('timedelta64[s]').dt.total_seconds()
-        group_data['R_Time'] = group_data['R_Time'].astype('timedelta64[s]').dt.total_seconds()
-
-        group_data = group_data[group_data['Trial'].isin([0, 1, 2])]
-        # Get the average of the three trials
-        group_data = group_data.groupby('Datetime').agg(
-            First_Reward=('First Reward', 'mean'),
-            R_Time=('R_Time', 'mean')
-        ).reset_index()
-
-        plt.bar(group_data['Datetime'], group_data['First_Reward'], label=f'Group {group}')
-        #plt.plot(group_data['Datetime'], group_data['R_Time'], label=f'Group {group} R Time')
-
-
-    # Reduce the number of listed times to make the graph more readable
-    plt.xticks(rotation=45)
-    plt.title('First Reward Over Time by Group')
-    plt.xlabel('Datetime')
-    plt.ylabel('First Reward Time (seconds)')
-    plt.legend()
-    plt.show()
 
 plot_mean_and_se_R_Time(combined_df)
 # plot_mean_and_se_First_Reward(combined_df)
-# plot_group_over_time(combined_df)
