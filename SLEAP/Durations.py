@@ -1,13 +1,13 @@
-from convertTimestamp import Timestamp
+from cheeseboardTimestamp import Timestamp
 from matplotlib import pyplot as plt
 import pandas as pd
 
-class DurationPlot():
+class Duration():
     def plot_durations(timestamp_file):
-        trials = Timestamp.convert_timestamp(timestamp_file)
+        timestamp = Timestamp(timestamp_file).trials
 
         # Plot the trial durations
-        durations = [trial['duration'].total_seconds() for trial in trials]
+        durations = [trial['duration'].total_seconds() for trial in timestamp]
 
         # Also do a moving average from the beginning
         window_size = 2

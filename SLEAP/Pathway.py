@@ -2,7 +2,7 @@ from convertTimestamp import Timestamp
 from matplotlib import pyplot as plt
 import pandas as pd
 
-class PathwayPlot():
+class Pathway():
     def plot_pathways(timestamp_file, tracking_part = 'nose1'):
         trials = Timestamp.convert_timestamp(timestamp_file)
 
