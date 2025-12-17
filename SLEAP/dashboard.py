@@ -1,10 +1,20 @@
-import sleapAnalysis
+from experimentStruct import ExperimentStruct
+import matplotlib.pyplot as plt
 
+timestamp = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/ExperimentVideo_2025-11-10_0705_timestamps.csv'
+trial_data = ExperimentStruct(timestamp)
 
-timestamp = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/ExperimentVideo_2025-11-10_0738_timestamps.csv'
+print(f"Loaded experiment with {len(trial_data.trials)} trials")
+print(f"Experiment ID: {trial_data.experimentTag}")
+print(f"SLEAP file: {trial_data.sleap_file}")
 
-trial_data = sleapAnalysis.sleapAndTimestamp(timestamp)
-
+# Create all plots
 trial_data.plot_durations()
-trial_data.plot_pathways(tracking_part='neck1')
+trial_data.plot_pathways()
 trial_data.plot_velocity()
+trial_data.plot_distance_traveled()
+# trial_data.plot_head_direction()
+# trial_data.plot_head_direction_velocity()
+trial_data.plot_angular_velocity_var()
+
+plt.show(block=True)

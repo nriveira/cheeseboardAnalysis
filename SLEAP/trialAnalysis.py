@@ -1,5 +1,4 @@
 # File for preliminary analysis of SLEAP data
-from cheeseboardTimestamp import Timestamp
 from matplotlib import pyplot as plt
 import pandas as pd
 
