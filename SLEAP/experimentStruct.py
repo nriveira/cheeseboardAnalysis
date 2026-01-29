@@ -243,7 +243,7 @@ class ExperimentStruct:
     def get_reward_locations(self, tracking_part='nose1'):
         """Extract reward locations from trials, assuming the rats location at time of reward is stored"""
         for trial in self.trials:
-            print(f"Getting reward locations for Trial {trial.trial_number}")
+            # print(f"Getting reward locations for Trial {trial.trial_number}")
 
             # Find the first data point at or after R1_idx
             R1_frame_idx = self.sleap_data[self.sleap_data['frame_idx'] == trial.R1_idx]
@@ -273,7 +273,7 @@ class ExperimentStruct:
         pathways = []
 
         for trial in trials:
-            print(f"Finding pathway for Trial {trial.trial_number}")
+            # print(f"Finding pathway for Trial {trial.trial_number}")
             start_idx = trial.sb_idx if trial.sb_idx is not None else trial.start_idx
             end_idx = trial.last_idx if trial.last_idx is not None else trial.end_idx
 
@@ -423,7 +423,7 @@ class ExperimentStruct:
             tracking_x = trial_sleap_data[bodypart_x].values
             tracking_y = trial_sleap_data[bodypart_y].values
 
-            print(f"Indices for Trial {trial.trial_number}: Start {start_idx}, End {end_idx}")
+            # print(f"Indices for Trial {trial.trial_number}: Start {start_idx}, End {end_idx}")
 
             plt.subplot(num_cols, 5, num_trial + 1)
             plt.plot(tracking_x, tracking_y, label=f'Trial {trial.trial_number}')

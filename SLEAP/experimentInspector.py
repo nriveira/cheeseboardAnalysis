@@ -1,7 +1,7 @@
 from experimentStruct import ExperimentStruct
 import matplotlib.pyplot as plt
 
-timestamp = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/ExperimentVideo_2025-11-19_0951_timestamps.csv'
+timestamp = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PreInterference1HourBlackEdited/ExperimentVideo_2025-11-19_1004_timestamps.csv'
 trial_data = ExperimentStruct(timestamp)
 
 print(f"Loaded experiment with {len(trial_data.trials)} trials")
