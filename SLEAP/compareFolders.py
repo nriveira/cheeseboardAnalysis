@@ -43,59 +43,100 @@ def distance_traveled_analysis(groupFolder):
 
 # Load in data from each experimental condition
 # White-Black-White 1 Hour
-preInt1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PreInterference1HourWhite'
-int1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/InterferenceBlack1Hr'
-postInt1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PostInterference1HourWhite'
+preInt1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PreInterference1HourWhite'
+int1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/InterferenceBlack1Hr'
+postInt1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PostInterference1HourWhite'
 
 # Black-White-Black 1 Hour
-preInt1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PreInterference1HourBlackEdited'
-int1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/InterferenceWhite1Hr'
-postInt1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PostInterference1HourBlackEdited'
+preInt1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PreInterference1HourBlackEdited'
+int1Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/InterferenceWhite1Hr'
+postInt1HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PostInterference1HourBlackEdited'
 
 # White-Black-White 4 Hour
-preInt4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PreInterference4HourWhite'
-int4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/InterferenceBlack4Hr'
-postInt4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PostInterference4HourWhite'
+preInt4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PreInterference4HourWhite'
+int4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/InterferenceBlack4Hr'
+postInt4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PostInterference4HourWhite'
 
 # Black-White-Black 4 Hour
-preInt4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PreInterference4HourBlack'
-int4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/InterferenceWhite4Hr'
-postInt4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/PostInterference4HourBlackEdited'
+preInt4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PreInterference4HourBlack'
+int4Hr = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/InterferenceWhite4Hr'
+postInt4HrBlack = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/SEPARATE/PostInterference4HourBlackEdited'
 
-# Make a function to plot the mean distance traveled with error bars and individual data points of a full session
-def plot_distance_traveled(pre, interfere, post, color, offset, preIntOffset, postIntOffset, label, scatter=True):
+# Plot the mean distance traveled with error bars and individual data points of a 
+# full experiment divided in folders
+def plot_distance_traveled_all(pre, interfere, post, color, offset, preIntOffset, postIntOffset, label, scatter=True):
     preMean, preSem, preMatrix = distance_traveled_analysis(pre)
     interfereMean, interfereSem, interfereMatrix = distance_traveled_analysis(interfere)
     postMean, postSem, postMatrix = distance_traveled_analysis(post)
 
-    plt.errorbar(preMean.index+offset, preMean.values, yerr=preSem.values, color=color, label=label + ' Pre Interference')
+    plt.errorbar(preMean.index+offset, preMean.values, yerr=preSem.values, color=color, label=label)
     plt.errorbar(interfereMean.index+20+offset+preIntOffset, interfereMean.values, yerr=interfereSem.values, color=color)
     plt.errorbar(postMean.index+30+offset+preIntOffset+postIntOffset, postMean.values, yerr=postSem.values, color=color)
     if scatter:
         plt.scatter(preMatrix.index.repeat(preMatrix.shape[1])+offset, preMatrix.values.flatten(), color=color, alpha=0.3)
         plt.scatter(interfereMatrix.index.repeat(interfereMatrix.shape[1])+20+offset+preIntOffset, interfereMatrix.values.flatten(), color=color, alpha=0.3)
         plt.scatter(postMatrix.index.repeat(postMatrix.shape[1])+30+offset+preIntOffset+postIntOffset, postMatrix.values.flatten(), color=color, alpha=0.3)
+
+# plt.figure()
+# plt.subplot(2,1,1)
+# plot_distance_traveled_all(preInt1Hr, int1HrBlack, postInt1Hr, color='lime', offset=-0.15, preIntOffset=0, postIntOffset=10, label='1 Hour WBW', scatter=True)
+# plot_distance_traveled_all(preInt1HrBlack, int1Hr, postInt1HrBlack, color='blue', offset=-0.05, preIntOffset=0, postIntOffset=10, label='1 Hour BWB', scatter=True)
+# # Put the legend to the right outside of the plot
+# plt.legend(loc='right')
+# plt.ylim(0, 2200)
+# plt.xlabel('Time')
+# # Hide x axis labels
+# plt.xticks([])
+# plt.ylabel('Distance Traveled (cm)')
+# plt.title('Mean Distance Traveled')
+
+# plt.subplot(2,1,2)
+# plot_distance_traveled_all(preInt4Hr, int4HrBlack, postInt4Hr, color='orange', offset=0.05, preIntOffset=10, postIntOffset=0, label='4 Hour WBW', scatter=True)
+# plot_distance_traveled_all(preInt4HrBlack, int4Hr, postInt4HrBlack, color='red', offset=0.15, preIntOffset=10, postIntOffset=0, label='4 Hour BWB', scatter=True)
+# plt.legend(loc='right')
+# plt.ylim(0, 2200)
+# plt.xlabel('Time')
+# plt.xticks([])
+# plt.ylabel('Distance Traveled (cm)')
+# plt.tight_layout()
+
+# plt.show(block=True)
+
+# Plot the mean distance traveled with error bars and individual data points of a 
+# Single session type
+def plot_distance_traveled_session(session, color, offset, label, scatter=True):
+    sessMean, sessSem, sessMatrix = distance_traveled_analysis(session)
+
+    plt.errorbar(sessMean.index+offset, sessMean.values, yerr=sessSem.values, color=color, label=label)
+    if scatter:
+        plt.scatter(sessMatrix.index.repeat(sessMatrix.shape[1])+offset, sessMatrix.values.flatten(), color=color, alpha=0.3)
+
+## Same analysis but with combined white and black
+pre1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PreInterference1Hr'
+pre4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PreInterference4Hr'
+int1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/Interference1Hr'
+int4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/Interference4Hr'
+post1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PostInterference1Hr'
+post4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PostInterference4Hr'
+
 plt.figure()
-plt.subplot(2,1,1)
-plot_distance_traveled(preInt1Hr, int1HrBlack, postInt1Hr, color='lime', offset=-0.15, preIntOffset=0, postIntOffset=10, label='1 Hour WBW', scatter=False)
-plot_distance_traveled(preInt1HrBlack, int1Hr, postInt1HrBlack, color='blue', offset=-0.05, preIntOffset=0, postIntOffset=10, label='1 Hour BWB', scatter=False)
+plot_distance_traveled_all(pre1HrAll, int1HrAll, post1HrAll, color='blue', offset=-0.1, preIntOffset=0, postIntOffset=10, label='1 Hour', scatter=True)
+plot_distance_traveled_all(pre4HrAll, int4HrAll, post4HrAll, color='red', offset=0.1, preIntOffset=10, postIntOffset=0, label='4 Hour', scatter=True)
 # Put the legend to the right outside of the plot
 plt.legend(loc='right')
 plt.ylim(0, 2200)
-plt.xlabel('Trials')
-# Hide x axis labels
+plt.xlabel('Time')
 plt.xticks([])
 plt.ylabel('Distance Traveled (cm)')
 plt.title('Mean Distance Traveled')
+plt.show()
 
-plt.subplot(2,1,2)
-plot_distance_traveled(preInt4Hr, int4HrBlack, postInt4Hr, color='orange', offset=0.05, preIntOffset=10, postIntOffset=0, label='4 Hour WBW', scatter=False)
-plot_distance_traveled(preInt4HrBlack, int4Hr, postInt4HrBlack, color='red', offset=0.15, preIntOffset=10, postIntOffset=0, label='4 Hour BWB', scatter=False)
-plt.legend(loc='right')
+plt.figure()
+plot_distance_traveled_session(int1HrAll, color='blue', offset=-0.1, label='1 Hour', scatter=True)
+plot_distance_traveled_session(int4HrAll, color='red', offset=+0.1, label='4 Hour', scatter=True)
 plt.ylim(0, 2200)
-plt.xlabel('Trials')
+plt.xlabel('Time')
 plt.xticks([])
 plt.ylabel('Distance Traveled (cm)')
-plt.tight_layout()
-
-plt.show(block=True)
+plt.title('Interference')
+plt.show()
