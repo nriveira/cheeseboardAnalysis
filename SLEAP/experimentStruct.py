@@ -7,6 +7,7 @@
 # In the future, this will also be useful for linking any timestamped data to its specific experiment trial.
 import numpy as np
 import pandas as pd
+from scipy.ndimage import gaussian_filter
 import matplotlib.pyplot as plt
 
 import os
@@ -54,7 +55,6 @@ class Trial:
         self.R1_loc = trial_dict.get('R1_loc', None)
         self.R2_loc = trial_dict.get('R2_loc', None)
         self.R3_loc = trial_dict.get('R3_loc', None)
-
         self.velocies = None  # To be filled later if needed
         
     def __repr__(self):
@@ -65,8 +65,11 @@ class ExperimentStruct:
     def __init__(self, timestamp_file):
         # 0) Basic experiment information
         self.experiment_type = None
+        self.occupancy_bin_size = 20  # Default bin size for occupancy maps
         # Recognize experiment date from metadata in file name: 
         self.experimentTag = self.extract_experiment_id(timestamp_file)
+        # Remove the preceeding 'ExerimentVideo_' for cleaner display
+        self.experimentTag = self.experimentTag.replace('ExperimentVideo_', '') if self.experimentTag else None
         print(f"Experiment Tag: {self.experimentTag}")
 
         # 1) Gather all data associated with experiment block
@@ -83,10 +86,40 @@ class ExperimentStruct:
         # 3) Analysis data
         self.durations = self.find_durations() if self.trials else []
         self.pathways = self.find_pathways() if self.sleap_data is not None else []
+        self.occupancy_maps = self.find_occupancy_map() if self.sleap_data is not None else []
         self.velocities = self.find_velocity() if self.sleap_data is not None else []
         self.distance_traveled = self.find_distance_traveled() if self.trials and self.velocities is not None else []
         self.head_directions = self.find_head_direction() if self.sleap_data is not None else []
         self.head_angular_velocities = self.find_head_direction_velocity() if self.sleap_data is not None else []
+
+    def save_trial_data(self, save_folder):
+        """Save the pathways data for all trials as a pandas DataFrame for easier loading in the future"""
+        # Combine pathways data into a single DataFrame
+        pathways_df = pd.DataFrame(self.pathways)
+
+        # Save to CSV
+        save_path = os.path.join(save_folder, f"{self.experimentTag}_pathways.csv")
+        pathways_df.to_csv(save_path, index=False)
+        print(f"Pathways data saved to {save_path}")
+
+        # Also trial data into a DataFrame
+        trial_data_list = []
+        for trial in self.trials:
+            trial_data_list.append({
+                'trial_number': trial.trial_number,
+                'start_time': trial.start_time,
+                'end_time': trial.end_time,
+                'duration': trial.duration,
+                'R1_time': trial.R1_time,
+                'R2_time': trial.R2_time,
+                'R3_time': trial.R3_time,
+                'R1_loc': trial.R1_loc,
+                'R2_loc': trial.R2_loc,
+                'R3_loc': trial.R3_loc
+            })
+        trial_data_df = pd.DataFrame(trial_data_list)
+        trial_save_path = os.path.join(save_folder, f"{self.experimentTag}_trial_data.csv")
+        trial_data_df.to_csv(trial_save_path, index=False)
 
     def extract_experiment_id(self, timestamp_file):
         """Extract the experiment identifier pattern from filename.
@@ -177,7 +210,8 @@ class ExperimentStruct:
                     'R3_idx': None,
                     'R1_loc': None,
                     'R2_loc': None,
-                    'R3_loc': None
+                    'R3_loc': None,
+                    'occupancy_map': None
                 }
             elif state == 2 and current_trial is not None:  # Left rest box
                 current_trial['sb_time'] = unix_time
@@ -273,7 +307,6 @@ class ExperimentStruct:
         pathways = []
 
         for trial in trials:
-            # print(f"Finding pathway for Trial {trial.trial_number}")
             start_idx = trial.sb_idx if trial.sb_idx is not None else trial.start_idx
             end_idx = trial.last_idx if trial.last_idx is not None else trial.end_idx
 
@@ -286,7 +319,52 @@ class ExperimentStruct:
 
             pathways.append((tracking_x, tracking_y))
         return pathways
+    
+    # SPATIAL ANALYSIS FUNCTIONS
+    def find_occupancy_map(self, trial=None, tracking_part='nose1'):
+        """Calculate location dwell time heatmap for specified body part"""
+        if trial is None:
+            trials_to_plot = self.trials
+        else:
+            trials_to_plot = [self.trials[trial]]
 
+        for trial in trials_to_plot:
+            start_idx = getattr(trial, 'sb_idx', trial.start_idx) if hasattr(trial, 'sb_idx') and trial.sb_idx else trial.start_idx
+            end_idx = trial.last_idx if hasattr(trial, 'last_idx') and trial.last_idx else trial.end_idx
+
+            trial_sleap_data = self.sleap_data[(self.sleap_data['frame_idx'] >= start_idx) & (self.sleap_data['frame_idx'] <= end_idx)]
+            bodypart_x = f'{tracking_part}.x'
+            bodypart_y = f'{tracking_part}.y'
+
+            tracking_x = trial_sleap_data[bodypart_x].values
+            tracking_y = trial_sleap_data[bodypart_y].values
+
+            heatmap, _, _ = np.histogram2d(tracking_x, tracking_y, bins=self.occupancy_bin_size, density=False,range=[[0, self.sleap_data[bodypart_x].max()], [0, self.sleap_data[bodypart_y].max()]])
+            trial.occupancy_map = heatmap
+
+    def firstLast_occupancy(self, trial=None, sigma=1):
+        """
+        Find the first and last three trial occupancy maps
+        """
+        trials_to_plot = self.trials
+
+        first_three_map = np.zeros_like(trials_to_plot[0].occupancy_map)
+        last_three_map = np.zeros_like(trials_to_plot[0].occupancy_map)
+
+        i = 0
+        for trial in trials_to_plot:
+            occupancy_map = trial.occupancy_map
+            # Convolve with a Gaussian kernel for smoothing
+            occupancy_map = gaussian_filter(occupancy_map, sigma=sigma)
+            i += 1
+            if i <= 3:
+                first_three_map += occupancy_map
+            if i > len(trials_to_plot) - 3:
+                last_three_map += occupancy_map
+
+        return first_three_map, last_three_map
+    
+    # VELOCITY AND DISTANCE FUNCTIONS
     def find_velocity(self, tracking_part='nose1', dt=30):
         """Calculate velocities at all points for specified body part"""
         if self.sleap_data is None:
@@ -322,6 +400,7 @@ class ExperimentStruct:
             distances.append(distance)
         return distances
     
+    # HEAD DIRECTION FUNCTIONS
     def find_head_direction(self):
         """ Using nose and neck positions, calculate head direction angles,
          accounting for wrap-around at 360 degrees """
@@ -437,7 +516,28 @@ class ExperimentStruct:
                 plt.scatter(trial.R3_loc[0], trial.R3_loc[1], color='blue', marker='x', label='R3')
 
         plt.title('Movement Pathways Across Trials')
-        plt.show(block=False)
+        plt.show(block=True)
+
+    def plot_occupancy_map(self, trial=None):
+        """
+        Find the first and last three trial occupancy maps
+        """
+        first_three_map, last_three_map = self.firstLast_occupancy(trial=trial)
+        kde_first_fit, kde_last_fit = self.find_KDE(first_three_map, last_three_map)
+
+        # Plot first and last three as separate figures
+        plt.subplots(1, 2, figsize=(10, 5))
+        plt.subplot(1, 2, 1)
+        plt.imshow(first_three_map.T, origin='lower', cmap='hot', interpolation='nearest')
+        plt.colorbar(label='Dwell Time')
+        # Make the title include the date timestamp
+        plt.title(f'{np.exp(kde_first_fit)}')
+        plt.subplot(1, 2, 2)
+        plt.imshow(last_three_map.T, origin='lower', cmap='hot', interpolation='nearest')
+        plt.colorbar(label='Dwell Time')
+        plt.title(f'{np.exp(kde_last_fit)}')
+        plt.tight_layout()
+        plt.show(block=True)
 
     def plot_velocity(self, threshold=75):
         """Plot velocity for each trial"""

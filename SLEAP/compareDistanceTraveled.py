@@ -1,5 +1,4 @@
 # Given a folder of behavior and timing data, concatenate to be able to do statistical analyses on the group.
-
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -112,31 +111,31 @@ def plot_distance_traveled_session(session, color, offset, label, scatter=True):
         plt.scatter(sessMatrix.index.repeat(sessMatrix.shape[1])+offset, sessMatrix.values.flatten(), color=color, alpha=0.3)
 
 ## Same analysis but with combined white and black
-pre1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PreInterference1Hr'
-pre4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PreInterference4Hr'
-int1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/Interference1Hr'
-int4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/Interference4Hr'
-post1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PostInterference1Hr'
-post4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/NOVEMBER/COMBINED/PostInterference4Hr'
+pre1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/1HourTrain'
+pre4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/4HourTrain'
+int1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/1HourInter'
+int4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/4HourInter'
+post1HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/1HourTest'
+post4HrAll = r'/Users/nick/Projects/cheeseboardAnalysis/DATA/FEBRUARY/4HourTest'
 
 plt.figure()
 plot_distance_traveled_all(pre1HrAll, int1HrAll, post1HrAll, color='blue', offset=-0.1, preIntOffset=0, postIntOffset=10, label='1 Hour', scatter=True)
 plot_distance_traveled_all(pre4HrAll, int4HrAll, post4HrAll, color='red', offset=0.1, preIntOffset=10, postIntOffset=0, label='4 Hour', scatter=True)
 # Put the legend to the right outside of the plot
 plt.legend(loc='right')
-plt.ylim(0, 2200)
+plt.ylim(0, 2500)
 plt.xlabel('Time')
 plt.xticks([])
 plt.ylabel('Distance Traveled (cm)')
 plt.title('Mean Distance Traveled')
-plt.show()
+plt.show(block=True)
 
 plt.figure()
-plot_distance_traveled_session(int1HrAll, color='blue', offset=-0.1, label='1 Hour', scatter=True)
-plot_distance_traveled_session(int4HrAll, color='red', offset=+0.1, label='4 Hour', scatter=True)
-plt.ylim(0, 2200)
+plot_distance_traveled_session(pre1HrAll, color='blue', offset=-0.1, label='1 Hour', scatter=True)
+plot_distance_traveled_session(pre4HrAll, color='red', offset=+0.1, label='4 Hour', scatter=True)
+plt.ylim(0, 2500)
 plt.xlabel('Time')
 plt.xticks([])
 plt.ylabel('Distance Traveled (cm)')
 plt.title('Interference')
-plt.show()
+plt.show(block=True)
